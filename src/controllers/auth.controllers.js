@@ -17,8 +17,35 @@ export async function signUp(req, res) {
             VALUES ($1,$2,$3)`, [name,email,encryptedPassword]);
 
         res.sendStatus(201);
-        
+
     } catch (error){
+        res.status(500).send(error.message);
+    }
+}
+
+export async function signIn (req, res){
+    const {email, password} = req.body;
+
+    try{
+        const user = await db.query(`SELECT * FROM users WHERE email=$1`,[email]);
+        
+        if(user.rowCount === 0) return res.status(401).send("Usuário/senha inválidos");
+
+        const isPasswordCorrect = bcrypt.compareSync(password, user.rows[0].password);
+
+        if(!isPasswordCorrect) return res.status(401).send("Usuário/senha inválidos");
+
+        const token = uuid();
+
+        const userId = user.rows[0].id;
+
+        await db.query(`INSERT INTO sessions 
+            ("userId",token)
+            VALUES ($1,$2)`,[userId, token]);
+        
+        res.status(200).send({token});
+
+    } catch(error){
         res.status(500).send(error.message);
     }
 }
