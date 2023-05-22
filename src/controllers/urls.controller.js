@@ -58,7 +58,7 @@ export async function openShortUrl (req, res) {
 
         if(resultShortedUrl.rowCount === 0) return res.status(404).send("A url não foi encontrada");
 
-        const {url, visitCount} = resultShortedUrl.rows[0];
+        let {url, visitCount} = resultShortedUrl.rows[0];
 
         visitCount++;
 
