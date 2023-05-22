@@ -66,8 +66,6 @@ export async function openShortUrl (req, res) {
 
         await db.query(`UPDATE urls SET "visitCount"=$1 WHERE "shortUrl"=$2;`,[visitCount,shortUrl]);
 
-        res.sendStatus(302);
-
     } catch (error){
         res.status(500).send(error.message);
     }
