@@ -32,3 +32,19 @@ export async function urlsShorten (req, res) {
         res.status(500).send(error.message);
     }
 }
+
+export async function getUrlById (req, res) {
+    
+    const { id } = req.params;
+
+    try{
+        const urlById = await db.query(`SELECT id,"shortUrl",url FROM urls WHERE id=$1;`,[id]);
+
+        if(urlById.rowCount === 0) return res.status(404).send("Não foi possível encontrar a url pelo id informado");
+
+        res.status(200).send(urlById.rows[0]);
+
+    }catch (error){
+        res.status(500).send(error.message);
+    }
+}
