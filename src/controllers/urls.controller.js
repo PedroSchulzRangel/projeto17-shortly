@@ -70,3 +70,34 @@ export async function openShortUrl (req, res) {
         res.status(500).send(error.message);
     }
 }
+
+export async function deleteUrl(req, res){
+    
+    const {authorization} = req.headers;
+    const {id} = req.params;
+    const token = authorization?.replace("Bearer ","");
+
+    if(!token) return res.status(401).send("token inválido");
+
+    try{
+        const session = await db.query(`SELECT * FROM sessions 
+            WHERE token=$1;`,[token]);
+
+        if(session.rowCount === 0) return res.status(401).send("token inválido");
+
+        const {userId} = session.rows[0];
+
+        const resultUrl = await db.query(`SELECT * FROM urls 
+            WHERE "userId"=$1 AND id=$2;`,[userId,id]);
+
+        if(resultUrl.rowCount === 0) return res.sendStatus(404);
+        
+        await db.query(`DELETE FROM urls WHERE id=$1;`,[id]);
+
+        res.sendStatus(204);
+
+    } catch (error){
+        res.status(500).send(error.message);
+    }
+
+}
