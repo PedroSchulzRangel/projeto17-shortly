@@ -6,7 +6,7 @@ export async function signUp(req, res) {
     const {name, email, password} = req.body;
 
     try{
-        const emailAlreadyInUse = await db.query(`SELECT * FROM users WHERE email=$1`,[email]);
+        const emailAlreadyInUse = await db.query(`SELECT * FROM users WHERE email=$1;`,[email]);
 
         if (emailAlreadyInUse.rowCount !== 0) return res.status(409).send("Este email de usuário já está cadastrado");
 
@@ -14,7 +14,7 @@ export async function signUp(req, res) {
 
         await db.query(`INSERT INTO users 
             (name,email,password)
-            VALUES ($1,$2,$3)`, [name,email,encryptedPassword]);
+            VALUES ($1,$2,$3);`, [name,email,encryptedPassword]);
 
         res.sendStatus(201);
 
@@ -27,7 +27,7 @@ export async function signIn (req, res){
     const {email, password} = req.body;
 
     try{
-        const user = await db.query(`SELECT * FROM users WHERE email=$1`,[email]);
+        const user = await db.query(`SELECT * FROM users WHERE email=$1;`,[email]);
         
         if(user.rowCount === 0) return res.status(401).send("Usuário/senha inválidos");
 
@@ -41,7 +41,7 @@ export async function signIn (req, res){
 
         await db.query(`INSERT INTO sessions 
             ("userId",token)
-            VALUES ($1,$2)`,[userId, token]);
+            VALUES ($1,$2);`,[userId, token]);
         
         res.status(200).send({token});
 
