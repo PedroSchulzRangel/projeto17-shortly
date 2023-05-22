@@ -48,3 +48,27 @@ export async function getUrlById (req, res) {
         res.status(500).send(error.message);
     }
 }
+
+export async function openShortUrl (req, res) {
+    
+    const {shortUrl} = req.params;
+
+    try{
+        const resultShortedUrl = await db.query(`SELECT * FROM urls WHERE shortUrl=$1;`,[shortUrl]);
+
+        if(resultShortedUrl.rowCount === 0) return res.status(404).send("A url não foi encontrada");
+
+        const {url, visitCount} = resultShortedUrl.rows[0];
+
+        res.redirect(url);
+
+        visitCount++;
+
+        await db.query(`UPDATE urls SET visitCount=$1 WHERE shortUrl=$2;`,[visitCount,shortUrl]);
+
+        res.sendStatus(302);
+
+    } catch (error){
+        res.status(500).send(error.message);
+    }
+}
