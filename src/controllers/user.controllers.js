@@ -44,7 +44,7 @@ export async function getRanking (req, res) {
             SUM(urls."visitCount") AS "visitCount"
             FROM users u LEFT JOIN urls ON u.id=urls."userId"
             GROUP BY u.id
-            ORDER BY "visitCount"
+            ORDER BY "visitCount" DESC
             LIMIT 10;`);
 
         res.status(200).send(resultRanking);
