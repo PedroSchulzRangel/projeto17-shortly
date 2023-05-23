@@ -35,3 +35,21 @@ export async function getUsers (req, res) {
         res.status(500).send(error.message);
     }
 }
+
+export async function getRanking (req, res) {
+    
+    try{
+        const {rows: resultRanking} = await db.query(`SELECT u.id, u.name,
+            COUNT(urls.url) As "linksCount", 
+            SUM(urls."visitCount") AS "visitCount"
+            FROM users u LEFT JOIN urls ON u.id=urls."userId"
+            GROUP BY u.id
+            ORDER BY "visitCount"
+            LIMIT 10;`);
+
+        res.status(200).send(resultRanking);
+
+    } catch (error){
+        res.status(500).send(error.message);
+    }
+}
