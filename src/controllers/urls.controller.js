@@ -87,14 +87,14 @@ export async function deleteUrl(req, res){
 
         const {userId} = session.rows[0];
 
+        const linkWithId = await db.query(`SELECT * FROM urls WHERE id=$1;`,[id]);
+
+        if(linkWithId.rowCount === 0) return res.status(404).send("O link com o id informado não existe");
+
         const resultUrl = await db.query(`SELECT * FROM urls 
             WHERE "userId"=$1 AND id=$2;`,[userId,id]);
 
         if(resultUrl.rowCount === 0) return res.sendStatus(401);
-
-        const linkWithId = await db.query(`SELECT * FROM urls WHERE id=$1;`,[id]);
-
-        if(linkWithId.rowCount === 0) return res.status(404).send("O link com o id informado não existe");
         
         await db.query(`DELETE FROM urls WHERE id=$1;`,[id]);
 
